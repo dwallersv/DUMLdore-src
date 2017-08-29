@@ -1,4 +1,4 @@
-﻿// DUMLdore v1.86 - jezzab 2017 - http://www.github.com/jezzab/DUMLdore/
+﻿// DUMLdore v1.88 - jezzab 2017 - http://www.github.com/jezzab/DUMLdore/
 // This softwre is used to flash and backup firmware files from a drone, remote controller or goggles
 // It requires OpenSSL and the WinSCP .NET Assembly 
 
@@ -174,13 +174,16 @@ namespace DUMLdore
                     //mkdir .bin if fireworks
                     if (fireworks == 1)
                         MakeFtpDir();
+                    
+                    //Send DUML
+                    serialPort1.Write(packet3_ac, 0, packet3_ac.Length);
+
                     if (UploadFirmware() == 0)
                     {
                         // bad way to do it but some devices require some more time to write/update. Checking for existance doesnt always work
                         System.Threading.Thread.Sleep(5000);
 
                         //send out start DUML packets
-                        serialPort1.Write(packet3_ac, 0, packet3_ac.Length);
                         serialPort1.Write(packet4_ac, 0, packet4_ac.Length);
                         toolStripStatusLabel1.Text = "Firmware Uploaded";
                         if (fireworks == 1)
@@ -234,6 +237,8 @@ namespace DUMLdore
                     //mkdir .bin if fireworks
                     if (fireworks == 1)
                         MakeFtpDir();
+                    //Send DUML
+                    serialPort1.Write(packet3_rc, 0, packet3_rc.Length);
 
                     if (UploadFirmware() == 0)
                     {
@@ -242,7 +247,6 @@ namespace DUMLdore
 
                         //send out start DUML packets
                         toolStripStatusLabel1.Text = "Please wait...";
-                        serialPort1.Write(packet3_rc, 0, packet3_rc.Length);
                         serialPort1.Write(packet4_rc, 0, packet4_rc.Length);
                         toolStripStatusLabel1.Text = "Firmware Uploaded";
                         if (fireworks == 1)
@@ -296,13 +300,14 @@ namespace DUMLdore
                     //mkdir .bin if fireworks
                     if (fireworks == 1)
                         MakeFtpDir();
+                    //Send DUML
+                    serialPort1.Write(packet3_gog, 0, packet3_gog.Length);
 
                     if (UploadFirmware() == 0)
                     {
                         // bad way to do it but some devices require some more time to write/update. Checking for existance doesnt always work
                         System.Threading.Thread.Sleep(5000);
                         //send out start DUML packets
-                        serialPort1.Write(packet3_gog, 0, packet3_gog.Length);
                         serialPort1.Write(packet4_gog, 0, packet4_gog.Length);
                         toolStripStatusLabel1.Text = "Firmware Uploaded";
                         if (fireworks == 1)
@@ -345,29 +350,10 @@ namespace DUMLdore
                     startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
                     startInfo.FileName = "cmd.exe";
                     startInfo.WorkingDirectory = @".\";
-                    startInfo.Arguments = "/C openssl.exe enc -d -nosalt -in " + fileArray[i].ToString() + " -aes-128-cbc -K 746869732d6165732d6b657900000000 -iv 00000000000000000000000000000000 > .\\decrypt\\" + Path.GetFileName(fileArray[i]);
+                    startInfo.Arguments = "/C openssl.exe enc -d -nosalt -in " + fileArray[i].ToString() + " -aes-128-cbc -K 746869732d6165732d6b657900000000 -iv 30313233343536373839616263646566 > .\\decrypt\\" + Path.GetFileName(fileArray[i]);
                     process.StartInfo = startInfo;
                     process.Start();
                     process.WaitForExit();
-                }
-                //fix the first 16 bytes of the decrypted files and overwrite
-                this.toolStripStatusLabel1.Text = "Fixing headers";
-                this.progressBar1.Value = 0;
-                for (int j = 0; j != fileArray.Length; j++)
-                {
-                    byte[] array = File.ReadAllBytes(".\\decrypt\\" + Path.GetFileName(fileArray[j]));
-                    // Descramble first 16 bytes
-                    for (int i = 0x00; i < 0x0A; i++)
-                    {
-                        array[i] ^= (byte)(0x30 + i);
-                    }
-                    for (int i = 0x0A; i < 0x10; i++)
-                    {
-                        array[i] ^= (byte)(0x57 + i);
-                    }
-                    //Write it back out
-                    File.WriteAllBytes(".\\decrypt\\" + Path.GetFileName(fileArray[j]), array);
-                    this.progressBar1.Increment(5);
                 }
                 toolStripStatusLabel1.Text = "Repackaging";
 
@@ -472,7 +458,7 @@ namespace DUMLdore
                     HostName = "192.168.42.2",
                     UserName = "guest",
                     Password = "password",
-                    TimeoutInMilliseconds = 30000,    // Default 15sec timeout is too short for aircraft to generate the encrypted temp files in some cases
+                    TimeoutInMilliseconds = 30000,    // Default 15sec timeout is too short for aircraft to generate the encrypted temp files in some cases - Kilrah
                 };
                 using (Session session = new Session())
                 {
