@@ -46,6 +46,7 @@ namespace DUMLdore
         byte[] packet2_sparkrc = { 0x55, 0x1A, 0x04, 0xB1, 0x02, 0x1B, 0xEB, 0x34, 0x40, 0x00, 0x08, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x04, 0xFF, 0xFF }; //Send filesize
         byte[] packet3_sparkrc = { 0x55, 0x1E, 0x04, 0x8A, 0x2A, 0x2D, 0x02, 0x28, 0x40, 0x00, 0x0A, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }; //Send MD5
 
+        byte[] packet1_unlock = { 0x55, 0x0E, 0x04, 0x66, 0x2A, 0x03, 0x01, 0x00, 0x40, 0x03, 0xFE, 0x00, 0x29, 0x72 };
 
         string filename;
         string dji_comport;
@@ -54,7 +55,7 @@ namespace DUMLdore
 
         int fireworks = 0;
         int downloading = 0;
-
+        bool bypass = false;
         //AC - 551A04B12A286B5740000800YYYYYYYY0000000000000204XXXX
         //RC - 551A04B12A2DEC2740000800YYYYYYYY0000000000000204XXXX
         // YYYYYYYY - packet size in little endian
@@ -85,11 +86,17 @@ namespace DUMLdore
                 toolStripStatusLabel1.Text = "Device found on " + dji_comport;
                 btnBackupFW.Enabled = true;
                 btnLoadFW.Enabled = true;
+                btnUnlock.Enabled = true;
             }
 
         }
         public void btnLoadFW_Click(object sender, EventArgs e)
         {
+            //Hold CTRL to bypass file checks on loaded firmware file
+            if ((ModifierKeys & Keys.Control) == Keys.Control)
+                bypass = true;
+            else
+                bypass = false;
             this.openFileDialog1.FileName = "";
             this.openFileDialog1.Filter = "Firmware Files|*dji_system.bin";
             // Process input if the user clicked OK.
@@ -102,26 +109,33 @@ namespace DUMLdore
 
                 uint filesize = (uint)FWarray.Length;
                 filesize_array = BitConverter.GetBytes(filesize);
-
+                if (bypass == false)
+                {
                 //Check the file isnt too small
-                if (FWarray.Length < 0x200)
-                    MessageBox.Show("Invalid Firmware File. File too small");
+                    if (FWarray.Length < 0x200)
+                        MessageBox.Show("Invalid Firmware File. File too small");
+                    else
+                    {
+                        //Check if it has the IM*H header
+                        if ((FWarray[0x200] != 0x49) && (FWarray[0x201] != 0x4D) && (FWarray[0x202] != 0x2A) && (FWarray[0x203] != 0x48))
+                        {
+                            //its not a fw file with IM*H header. Check if it is a fireworks.tar. Check for "Burn" header
+                            if ((FWarray[0x00] != 0x42) && (FWarray[0x01] != 0x75) && (FWarray[0x02] != 0x72) && (FWarray[0x03] != 0x6E))
+                                MessageBox.Show("Invalid Firmware File");
+                            else
+                            {
+                                fireworks = 1;
+                                btnFlashFW.Enabled = true;
+                            }
+                        }
+                        else
+                            btnFlashFW.Enabled = true;
+                    }
+                }
                 else
                 {
-                    //Check if it has the IM*H header
-                    if ((FWarray[0x200] != 0x49) && (FWarray[0x201] != 0x4D) && (FWarray[0x202] != 0x2A) && (FWarray[0x203] != 0x48))
-                    {
-                        //its not a fw file with IM*H header. Check if it is a fireworks.tar. Check for "Burn" header
-                        if ((FWarray[0x00] != 0x42) && (FWarray[0x01] != 0x75) && (FWarray[0x02] != 0x72) && (FWarray[0x03] != 0x6E))
-                            MessageBox.Show("Invalid Firmware File");
-                        else
-                        {
-                            fireworks = 1;
-                            btnFlashFW.Enabled = true;
-                        }
-                    }
-                    else
-                        btnFlashFW.Enabled = true;
+                    fireworks = 1;
+                    btnFlashFW.Enabled = true;
                 }
             }
         }
@@ -483,7 +497,7 @@ namespace DUMLdore
         }
         public int UploadFirmware()
         {
-            //upload the dji_sysetm.bin file
+            //upload the dji_system.bin file
             try
             {
                 // Setup session options
@@ -747,6 +761,25 @@ namespace DUMLdore
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start("www.github.com/jezzab/DUMLdore");
+        }
+
+        private void btnUnlock_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                MessageBox.Show("This will unlock a drone with a firmware that has expired and become grounded. The mobile app may override this setting if its online.");
+                serialPort1.Open();
+                // send init DUML packets
+                serialPort1.Write(packet1_unlock, 0, packet1_unlock.Length);
+                toolStripStatusLabel1.Text = "Starting serial comms";
+                serialPort1.Close();
+                toolStripStatusLabel1.Text = "Drone unlocked";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Unable to contact device, the serial port is closed or disconnected. Please plug in the device, close Assistant2 if running and restart the device and software");
+            }
+
         }
     }
 }

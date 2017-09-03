@@ -45,6 +45,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.btnUnlock = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -84,7 +85,7 @@
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(107, 348);
+            this.lblStatus.Location = new System.Drawing.Point(107, 366);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(13, 20);
             this.lblStatus.TabIndex = 5;
@@ -164,7 +165,7 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(29, 345);
+            this.progressBar1.Location = new System.Drawing.Point(29, 363);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(417, 23);
             this.progressBar1.Step = 1;
@@ -176,7 +177,7 @@
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 380);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 399);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(475, 30);
             this.statusStrip1.SizingGrip = false;
@@ -192,7 +193,7 @@
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(119, 308);
+            this.linkLabel1.Location = new System.Drawing.Point(119, 326);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(218, 20);
             this.linkLabel1.TabIndex = 12;
@@ -200,11 +201,23 @@
             this.linkLabel1.Text = "http://www.github.com/jezzab/";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
+            // btnUnlock
+            // 
+            this.btnUnlock.Enabled = false;
+            this.btnUnlock.Location = new System.Drawing.Point(156, 286);
+            this.btnUnlock.Name = "btnUnlock";
+            this.btnUnlock.Size = new System.Drawing.Size(156, 31);
+            this.btnUnlock.TabIndex = 13;
+            this.btnUnlock.Text = "Unlock";
+            this.btnUnlock.UseVisualStyleBackColor = true;
+            this.btnUnlock.Click += new System.EventHandler(this.btnUnlock_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(475, 410);
+            this.ClientSize = new System.Drawing.Size(475, 429);
+            this.Controls.Add(this.btnUnlock);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.progressBar1);
@@ -220,7 +233,7 @@
             this.Name = "Form1";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " DUMLdore V1.88 - jezzab";
+            this.Text = " DUMLdore V1.89 - jezzab";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -248,6 +261,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.Button btnUnlock;
     }
 }
 
