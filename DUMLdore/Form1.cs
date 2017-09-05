@@ -1,4 +1,4 @@
-﻿// DUMLdore v1.89b - jezzab 2017 - http://www.github.com/jezzab/DUMLdore/
+﻿// DUMLdore v1.90 - jezzab 2017 - http://www.github.com/jezzab/DUMLdore/
 // This softwre is used to flash and backup firmware files from a drone, remote controller or goggles
 // It requires OpenSSL and the WinSCP .NET Assembly 
 
@@ -470,7 +470,7 @@ namespace DUMLdore
                     HostName = "192.168.42.2",
                     UserName = "guest",
                     Password = "password",
-                    TimeoutInMilliseconds = 30000,    // Default 15sec timeout is too short for aircraft to generate the encrypted temp files in some cases - Kilrah
+                    TimeoutInMilliseconds = 120000,    // Extended timeout to 120 sec because never .1000 takes more time and fails
                 };
                 using (Session session = new Session())
                 {
