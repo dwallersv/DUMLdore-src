@@ -1,4 +1,4 @@
-﻿// DUMLdore v1.88 - jezzab 2017 - http://www.github.com/jezzab/DUMLdore/
+﻿// DUMLdore v1.89b - jezzab 2017 - http://www.github.com/jezzab/DUMLdore/
 // This softwre is used to flash and backup firmware files from a drone, remote controller or goggles
 // It requires OpenSSL and the WinSCP .NET Assembly 
 
@@ -46,7 +46,7 @@ namespace DUMLdore
         byte[] packet2_sparkrc = { 0x55, 0x1A, 0x04, 0xB1, 0x02, 0x1B, 0xEB, 0x34, 0x40, 0x00, 0x08, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x04, 0xFF, 0xFF }; //Send filesize
         byte[] packet3_sparkrc = { 0x55, 0x1E, 0x04, 0x8A, 0x2A, 0x2D, 0x02, 0x28, 0x40, 0x00, 0x0A, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }; //Send MD5
 
-        byte[] packet1_unlock = { 0x55, 0x0E, 0x04, 0x66, 0x2A, 0x03, 0x01, 0x00, 0x40, 0x03, 0xFE, 0x00, 0x29, 0x72 };
+        byte[] packet1_unlock = { 0x55, 0x0E, 0x04, 0x66, 0x2A, 0x03, 0x01, 0x00, 0x40, 0x03, 0xFE, 0x00, 0x29, 0x72 }; //packet to unlock FC
 
         string filename;
         string dji_comport;
@@ -87,8 +87,9 @@ namespace DUMLdore
                 btnBackupFW.Enabled = true;
                 btnLoadFW.Enabled = true;
                 btnUnlock.Enabled = true;
+                serialPort1.BaudRate = 115200;
+                serialPort1.PortName = dji_comport;
             }
-
         }
         public void btnLoadFW_Click(object sender, EventArgs e)
         {
@@ -141,9 +142,6 @@ namespace DUMLdore
         }
         public void btnFlashFW_Click(object sender, EventArgs e)
         {
-            serialPort1.BaudRate = 115200;
-            serialPort1.PortName = dji_comport;
-
             // Setup session options
             SessionOptions sessionOptions = new SessionOptions
             {
